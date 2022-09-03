@@ -1,2 +1,14 @@
-# ROX
-A YouTube Downloader for Japanese Students
+# ROX - 放送局員のためのYouTubeダウンローダー
+## 特徴
+* 複数キーワードの**検索・ダウンロード・無音部分の削除**を**ワンクリック**で実行
+* 日本製
+* オープンソース
+## 動作要件
+|名称| 推奨要件 | 最低要件 |
+|--|--|--|
+| CPU | **Intel Core i3-2310M** 以上か同等 | 1GHz 以上のCPU または SoC
+| RAM |**4GB** 以上  | 32bitなら1GB、64bitなら2GB
+| HDD |**1GB** 以上 | 同文
+| OS| Windows 8 / 10 / 11 | Python 3.10.x が動作する環境
+## インストーラー
+[Release v0.0.0](https://tast.jp)
