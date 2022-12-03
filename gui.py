@@ -4,6 +4,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 import functions
 from concurrent.futures import ThreadPoolExecutor
+import threading
 import os
 from tqdm import tqdm
 import sys
@@ -23,29 +24,40 @@ def main():
     global dir
     global isSilence
     global statusLabel
+    global update
     print(l)
     #ユーザー設定の変数
     downloadDir = (dir + '/' + functions.makeDirName() + '/')
-    print(silence)
-    if silence == "PY_VAR0":
+    now = silence.get()
+    print(now)
+    if now == 0:
         isSilence = "true"
-    else:
+    elif now == 1:
         isSilence = "false"
-
     print(isSilence)
     print('[System:notice]\u0020ダウンロードを開始します')
     #l配列内の全ての値をdownload関数へ代入
+    statusLabel.config(text="動作中")
     with ThreadPoolExecutor(max_workers=WORKERS) as tpe:
         for onel in l:
             print('[System:Start]\u0020' + onel[1] + onel[2])
             #MVを検索ワードに追加することでFIRSTTAKE回避
             #マルチスレッド処理にsubmit
             tpe.submit(functions.download,onel[1] + onel[2] + 'mv',downloadDir,isSilence)
-        tpe.shutdown()
+            update()
+    tpe.shutdown()
     print('[System:notice]\u0020すべてのダウンロードが完了しました')
+    statusLabel.config(text="完了")
     return
 
 #backendここから
+def update():
+    global pbval
+    global pbmax
+    global pb
+    pbval.set(pbval.get() + 1)
+    if pbval.get() > pbmax:
+        pbval.set(0)
 def quit_me(root_window):
     root_window.quit()
     root_window.destroy()
@@ -98,8 +110,10 @@ def dir_click():
     dirName.set(iDirPath)
     dir = iDirPath
 def click_download():
-    statusLabel.config(text="動作中")
-    main()
+    global pbmax
+    pbmax = len(l)
+    thread1 = threading.Thread(target=main)
+    thread1.start()
     statusLabel["text"] = "完了"
     return
 #backendここまで
@@ -119,9 +133,10 @@ silenceFrame = tk.LabelFrame(controlFrame,bd=2,relief="ridge",text="無音削除
 dirFrame = tk.LabelFrame(controlFrame,bd=2,relief="ridge",text="保存フォルダ")
 runFrame = tk.LabelFrame(controlFrame,bd=2,relief="ridge",text="実行")
 statusFrame = tk.LabelFrame(controlFrame,bd=2,relief="ridge",text="ステータス")
+progressbarFrame = tk.LabelFrame(root,bd=2,relief="ridge",text="進捗バー")
 
 #ロゴ・タイトル
-logo = tk.PhotoImage(file="/Users/nswk/Creative Cloud Files/_学校系/放送局系/ROX/App/images/logo_small.png")
+logo = tk.PhotoImage(file="/Users/nswk/Documents/GitHub/rox/images/logo_small.png")
 
 image=tk.Label(titleFrame,image=logo)
 image['bg'] = root['bg']
@@ -169,8 +184,11 @@ IDirButton = ttk.Button(dirFrame, text="参照", command=dir_click)
 #ダウンロード中
 statusLabel = tk.Label(statusFrame,text=u"　", font=("", 12))
 statusLabel["text"] = "停止中"
-#配置
 
+#status
+
+
+#配置
 titleFrame.pack(fill="x",padx=60,pady=0)
 addFrame.pack(fill="x",padx=60,pady=0)
 listFrame.pack(fill="x",padx=60,pady=0)
@@ -180,6 +198,7 @@ silenceFrame.pack(side=tk.LEFT,padx=0,pady=10)
 dirFrame.pack(side=tk.LEFT,padx=10,pady=10)
 runFrame.pack(fill="x",side=tk.LEFT,padx=10,pady=10)
 statusFrame.pack(fill="x",side=tk.LEFT,padx=0,pady=10)
+progressbarFrame.pack(fill="x",side=tk.LEFT,padx=0,pady=10)
 
 image.pack(side=tk.LEFT)
 
@@ -204,6 +223,8 @@ IDirButton.pack(side=tk.LEFT)
 controlRun.pack(side=tk.LEFT,anchor = tk.W)
 
 statusLabel.pack(side=tk.TOP)
+
+pb.pack(side=tk.BOTTOM)
 
 #表示
 if __name__ == "__main__":
