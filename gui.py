@@ -51,13 +51,6 @@ def main():
     return
 
 #backendここから
-def update():
-    global pbval
-    global pbmax
-    global pb
-    pbval.set(pbval.get() + 1)
-    if pbval.get() > pbmax:
-        pbval.set(0)
 def quit_me(root_window):
     root_window.quit()
     root_window.destroy()
@@ -224,7 +217,6 @@ controlRun.pack(side=tk.LEFT,anchor = tk.W)
 
 statusLabel.pack(side=tk.TOP)
 
-pb.pack(side=tk.BOTTOM)
 
 #表示
 if __name__ == "__main__":
