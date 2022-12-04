@@ -37,6 +37,7 @@ def main():
     print(isSilence)
     print('[System:notice]\u0020ダウンロードを開始します')
     #l配列内の全ての値をdownload関数へ代入
+    counter = 0
     statusLabel.config(text="動作中")
     with ThreadPoolExecutor(max_workers=WORKERS) as tpe:
         for onel in l:
@@ -44,7 +45,8 @@ def main():
             #MVを検索ワードに追加することでFIRSTTAKE回避
             #マルチスレッド処理にsubmit
             tpe.submit(functions.download,onel[1] + onel[2] + 'mv',downloadDir,isSilence)
-            update()
+            counter += 1
+            statusLabel.config(text=str(counter)+"/"+str(len(l)))
     tpe.shutdown()
     print('[System:notice]\u0020すべてのダウンロードが完了しました')
     statusLabel.config(text="完了")
@@ -64,9 +66,9 @@ def addMusic():
     no += 1
     artist = addArtistBox.get()
     title = addTitleBox.get()
-    #if not artist or not title:
-    #    messagebox.showwarning('ROX Assistant Error', 'アーティスト名と曲名、またはその片方が不正な値です。')
-    #    return
+    if not artist or not title:
+        messagebox.showwarning('ROX Assistant Error', 'アーティスト名と曲名、またはその片方が不正な値です。')
+        return
     l.append([no,artist,title])
     list.insert("","end",values=(no,artist,title))
     addArtistBox.delete(0, tk.END)
